@@ -66,7 +66,7 @@ const usePathfindingController = () => {
         }
 
         return () => clearInterval(intervalRef.current);
-    }, [isPlaying, speed, grid, algorithm, isFinished]);
+    }, [isPlaying, speed, algorithm, isFinished]);
 
     const animatePath = (path) => {
         let i = 0;

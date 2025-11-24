@@ -73,12 +73,14 @@ const usePathfindingStore = create((set, get) => ({
     setGrid: (grid) => set({ grid }),
     markVisited: (row, col) => set((state) => {
         const newGrid = [...state.grid];
-        newGrid[row][col].isVisited = true;
+        newGrid[row] = [...newGrid[row]];
+        newGrid[row][col] = { ...newGrid[row][col], isVisited: true };
         return { grid: newGrid };
     }),
     markPath: (row, col) => set((state) => {
         const newGrid = [...state.grid];
-        newGrid[row][col].isPath = true;
+        newGrid[row] = [...newGrid[row]];
+        newGrid[row][col] = { ...newGrid[row][col], isPath: true };
         return { grid: newGrid };
     }),
 }));

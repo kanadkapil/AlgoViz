@@ -22,13 +22,15 @@ const useSortingStore = create((set, get) => ({
 
     resetArray: () => {
         const { arraySize } = get();
-        set({ array: generateArray(arraySize), isSorted: false, sortedIndices: [], comparisonIndices: [], swapIndices: [] });
+        set({ array: generateArray(arraySize), isSorted: false, isPlaying: false, sortedIndices: [], comparisonIndices: [], swapIndices: [] });
     },
 
     setArray: (array) => set({ array }),
     setComparisonIndices: (indices) => set({ comparisonIndices: indices }),
     setSwapIndices: (indices) => set({ swapIndices: indices }),
-    setSortedIndices: (indices) => set({ sortedIndices: indices }),
+    setSortedIndices: (indices) => set((state) => ({
+        sortedIndices: typeof indices === 'function' ? indices(state.sortedIndices) : indices
+    })),
     markSorted: () => set({ isSorted: true, isPlaying: false, comparisonIndices: [], swapIndices: [] }),
 }));
 
