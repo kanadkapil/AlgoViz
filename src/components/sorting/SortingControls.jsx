@@ -34,11 +34,11 @@ const SortingControls = () => {
                     <option value="insertionSort">Insertion Sort</option>
                     <option value="mergeSort">Merge Sort</option>
                     <option value="quickSort">Quick Sort</option>
-                    <option value="heapSort" disabled>Heap Sort (Coming Soon)</option>
-                    <option value="radixSort" disabled>Radix Sort (Coming Soon)</option>
-                    <option value="countingSort" disabled>Counting Sort (Coming Soon)</option>
-                    <option value="bucketSort" disabled>Bucket Sort (Coming Soon)</option>
-                    <option value="timSort" disabled>Tim Sort (Coming Soon)</option>
+                    <option value="heapSort">Heap Sort</option>
+                    <option value="radixSort">Radix Sort</option>
+                    <option value="countingSort">Counting Sort</option>
+                    <option value="bucketSort">Bucket Sort</option>
+                    <option value="timSort">Tim Sort</option>
                 </select>
             </div>
 

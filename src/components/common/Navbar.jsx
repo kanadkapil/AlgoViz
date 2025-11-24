@@ -1,10 +1,10 @@
 import React from 'react';
-import { Menu, Settings } from 'lucide-react';
+import { Menu, Settings, BookOpen } from 'lucide-react';
 import ThemeSwitcher from './ThemeSwitcher';
 import useAppStore from '../../store/useAppStore';
 
 const Navbar = ({ toggleSidebar }) => {
-    const { mode, setMode } = useAppStore();
+    const { mode, setMode, toggleTheory } = useAppStore();
 
     return (
         <div className="navbar bg-base-100 border-b border-base-300 h-16 min-h-[4rem]">
@@ -31,10 +31,14 @@ const Navbar = ({ toggleSidebar }) => {
                 </div>
             </div>
             <div className="flex-none gap-2">
-                <ThemeSwitcher />
-                <button className="btn btn-ghost btn-circle">
-                    <Settings className="w-5 h-5" />
+                <button
+                    className="btn btn-ghost btn-circle"
+                    onClick={toggleTheory}
+                    title="Theory & Code"
+                >
+                    <BookOpen className="w-5 h-5" />
                 </button>
+                <ThemeSwitcher />
             </div>
         </div>
     );

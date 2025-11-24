@@ -5,6 +5,11 @@ import { selectionSort } from '../algorithms/sorting/selectionSort';
 import { insertionSort } from '../algorithms/sorting/insertionSort';
 import { mergeSort } from '../algorithms/sorting/mergeSort';
 import { quickSort } from '../algorithms/sorting/quickSort';
+import { heapSort } from '../algorithms/sorting/heapSort';
+import { radixSort } from '../algorithms/sorting/radixSort';
+import { countingSort } from '../algorithms/sorting/countingSort';
+import { bucketSort } from '../algorithms/sorting/bucketSort';
+import { timSort } from '../algorithms/sorting/timSort';
 
 const algorithms = {
     bubbleSort,
@@ -12,7 +17,11 @@ const algorithms = {
     insertionSort,
     mergeSort,
     quickSort,
-    // Add others here
+    heapSort,
+    radixSort,
+    countingSort,
+    bucketSort,
+    timSort,
 };
 
 const useSortingController = () => {
