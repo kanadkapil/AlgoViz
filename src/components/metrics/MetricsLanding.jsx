@@ -1,5 +1,5 @@
-import React from 'react';
-import { Bar, Line, Radar } from 'react-chartjs-2';
+import React, { useState, useMemo } from 'react';
+import { Bar, Line, Radar, Doughnut, Pie, PolarArea, Bubble, Scatter } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,8 +11,12 @@ import {
   Tooltip,
   Legend,
   RadialLinearScale,
+  ArcElement,
+  Filler
 } from 'chart.js';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { sortingMetrics, pathfindingMetrics } from '../../data/algorithmMetrics';
+import { Check } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -23,10 +27,39 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  RadialLinearScale
+  RadialLinearScale,
+  ArcElement,
+  Filler
 );
 
 const MetricsLanding = () => {
+  const [category, setCategory] = useState('sorting'); // 'sorting' or 'pathfinding'
+  const [selectedAlgos, setSelectedAlgos] = useState(['bubbleSort', 'mergeSort', 'quickSort']);
+
+  const metricsData = category === 'sorting' ? sortingMetrics : pathfindingMetrics;
+  const availableAlgos = Object.keys(metricsData);
+
+  // Ensure selection is valid when switching categories
+  React.useEffect(() => {
+    if (category === 'pathfinding' && !selectedAlgos.some(algo => pathfindingMetrics[algo])) {
+        setSelectedAlgos(['dijkstra', 'astar', 'bfs']);
+    } else if (category === 'sorting' && !selectedAlgos.some(algo => sortingMetrics[algo])) {
+        setSelectedAlgos(['bubbleSort', 'mergeSort', 'quickSort']);
+    }
+  }, [category]);
+
+  const toggleAlgo = (key) => {
+    if (selectedAlgos.includes(key)) {
+        if (selectedAlgos.length > 1) {
+            setSelectedAlgos(selectedAlgos.filter(k => k !== key));
+        }
+    } else {
+        if (selectedAlgos.length < 5) { // Limit to 5 for readability
+            setSelectedAlgos([...selectedAlgos, key]);
+        }
+    }
+  };
+
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -40,143 +73,265 @@ const MetricsLanding = () => {
     }
   };
 
-  const timeComplexityData = {
+  const noGridOptions = {
+    ...commonOptions,
+    scales: {
+        y: { display: false },
+        x: { display: false }
+    }
+  };
+
+  // --- Dynamic Data Generation ---
+
+  const timeComplexityData = useMemo(() => ({
     labels: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
-    datasets: [
-      {
-        label: 'O(n²) - Bubble/Insertion/Selection',
-        data: [100, 400, 900, 1600, 2500, 3600, 4900, 6400, 8100, 10000],
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+    datasets: selectedAlgos.map(key => ({
+        label: metricsData[key].name,
+        data: metricsData[key].timeComplexity,
+        borderColor: metricsData[key].color,
+        backgroundColor: metricsData[key].bg,
+        fill: false,
         tension: 0.4,
-      },
-      {
-        label: 'O(n log n) - Merge/Quick/Heap',
-        data: [33, 86, 147, 212, 282, 354, 429, 506, 584, 664],
-        borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        tension: 0.4,
-      },
-      {
-        label: 'O(n) - Linear',
-        data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        tension: 0.4,
-      },
-    ],
-  };
+    }))
+  }), [selectedAlgos, metricsData]);
 
-  const spaceComplexityData = {
-    labels: ['Bubble', 'Insertion', 'Selection', 'Merge', 'Quick', 'Heap', 'Counting', 'Radix'],
-    datasets: [
-      {
-        label: 'Space Complexity (Auxiliary)',
-        data: [1, 1, 1, 50, 20, 1, 80, 60], // Abstract relative scale
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(255, 159, 64, 0.6)',
-        ],
-      },
-    ],
-  };
+  const spaceComplexityData = useMemo(() => ({
+    labels: selectedAlgos.map(key => metricsData[key].name),
+    datasets: [{
+        label: 'Auxiliary Space (Units)',
+        data: selectedAlgos.map(key => metricsData[key].spaceComplexity),
+        backgroundColor: selectedAlgos.map(key => metricsData[key].color),
+    }]
+  }), [selectedAlgos, metricsData]);
 
-  const radarData = {
-    labels: ['Speed', 'Memory Efficiency', 'Simplicity', 'Stability', 'Adaptability'],
-    datasets: [
-      {
-        label: 'Quick Sort',
-        data: [90, 70, 60, 20, 80],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
+  const radarData = useMemo(() => ({
+    labels: category === 'sorting' 
+        ? ['Speed (Small)', 'Speed (Large)', 'Memory', 'Simplicity', 'Stability']
+        : ['Speed', 'Memory', 'Simplicity', 'Optimality', 'Completeness'],
+    datasets: selectedAlgos.map(key => ({
+        label: metricsData[key].name,
+        data: metricsData[key].radar,
+        backgroundColor: metricsData[key].bg,
+        borderColor: metricsData[key].color,
+        borderWidth: 2,
+    }))
+  }), [selectedAlgos, metricsData, category]);
+
+  const stabilityData = useMemo(() => {
+    const stableCount = selectedAlgos.filter(key => metricsData[key].isStable).length;
+    const unstableCount = selectedAlgos.length - stableCount;
+    return {
+        labels: [category === 'sorting' ? 'Stable' : 'Optimal', category === 'sorting' ? 'Unstable' : 'Sub-optimal'],
+        datasets: [{
+            data: [stableCount, unstableCount],
+            backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+            borderWidth: 1,
+        }]
+    };
+  }, [selectedAlgos, metricsData, category]);
+
+  const typeData = useMemo(() => {
+    const types = {};
+    selectedAlgos.forEach(key => {
+        const t = metricsData[key].type;
+        types[t] = (types[t] || 0) + 1;
+    });
+    return {
+        labels: Object.keys(types),
+        datasets: [{
+            data: Object.values(types),
+            backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 159, 64, 0.6)'],
+            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 159, 64, 1)'],
+            borderWidth: 1,
+        }]
+    };
+  }, [selectedAlgos, metricsData]);
+
+  const polarData = useMemo(() => ({
+    labels: category === 'sorting' 
+        ? ['Random', 'Sorted', 'Reverse', 'Few Unique']
+        : ['Open Maze', 'Maze with Walls', 'Weighted', 'Negative Edges'],
+    datasets: selectedAlgos.map(key => ({
+        label: metricsData[key].name,
+        data: metricsData[key].polar,
+        backgroundColor: metricsData[key].bg.replace('0.2', '0.5'), // More opaque
         borderWidth: 1,
-      },
-      {
-        label: 'Merge Sort',
-        data: [85, 40, 50, 100, 90],
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
+    }))
+  }), [selectedAlgos, metricsData, category]);
+
+  const bubbleData = useMemo(() => ({
+    datasets: selectedAlgos.map(key => ({
+        label: metricsData[key].name,
+        data: [metricsData[key].bubble],
+        backgroundColor: metricsData[key].color,
+    }))
+  }), [selectedAlgos, metricsData]);
+
+  const scatterData = useMemo(() => ({
+    datasets: selectedAlgos.map(key => ({
+        label: metricsData[key].name,
+        data: [metricsData[key].scatter],
+        backgroundColor: metricsData[key].color,
+        pointRadius: 8
+    }))
+  }), [selectedAlgos, metricsData]);
+
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-base-100 text-base-content p-6">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Algorithm Performance Metrics</h1>
-        <p className="text-xl opacity-70">Comprehensive analysis of Time and Space complexities.</p>
+    <div className="h-full w-full overflow-y-auto bg-base-100 text-base-content p-6 flex flex-col">
+      <div className="text-center mb-8">
+        <h1 className="text-5xl font-bold mb-4">Algorithm Analytics</h1>
+        <p className="text-xl opacity-70 max-w-3xl mx-auto mb-6">
+          Compare algorithms side-by-side. Select up to 5 algorithms to visualize their performance metrics.
+        </p>
+        
+        {/* Controls */}
+        <div className="flex flex-col items-center gap-4">
+            <div className="join">
+                <button 
+                    className={`btn join-item ${category === 'sorting' ? 'btn-primary' : 'btn-neutral'}`}
+                    onClick={() => setCategory('sorting')}
+                >
+                    Sorting
+                </button>
+                <button 
+                    className={`btn join-item ${category === 'pathfinding' ? 'btn-secondary' : 'btn-neutral'}`}
+                    onClick={() => setCategory('pathfinding')}
+                >
+                    Pathfinding
+                </button>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-2 max-w-4xl">
+                {availableAlgos.map(key => (
+                    <button
+                        key={key}
+                        className={`btn btn-sm ${selectedAlgos.includes(key) ? (category === 'sorting' ? 'btn-outline btn-primary' : 'btn-outline btn-secondary') : 'btn-ghost'}`}
+                        onClick={() => toggleAlgo(key)}
+                    >
+                        {selectedAlgos.includes(key) && <Check className="w-4 h-4 mr-1" />}
+                        {metricsData[key].name}
+                    </button>
+                ))}
+            </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="card bg-base-200 shadow-xl p-6 h-96"
-        >
-            <Line 
-                data={timeComplexityData} 
-                options={{
-                    ...commonOptions, 
-                    plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Time Complexity Growth (Operations vs Input Size)' } }
-                }} 
-            />
-        </motion.div>
+      {/* Charts Grid */}
+      <div className="space-y-12">
+          
+        {/* Row 1: The Big Picture (Line & Bar) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[450px]">
+                <h3 className="text-xl font-bold mb-2">Time Complexity Growth</h3>
+                <p className="text-sm opacity-70 mb-4">Execution time vs Input size (n).</p>
+                <div className="flex-1 min-h-0">
+                    <Line data={timeComplexityData} options={{...commonOptions, plugins: {...commonOptions.plugins, title: {display:false}}}} />
+                </div>
+            </motion.div>
 
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="card bg-base-200 shadow-xl p-6 h-96"
-        >
-            <Bar 
-                data={spaceComplexityData} 
-                options={{
-                    ...commonOptions, 
-                    plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Auxiliary Space Complexity Comparison' } }
-                }} 
-            />
-        </motion.div>
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[450px]">
+                <h3 className="text-xl font-bold mb-2">Space Complexity</h3>
+                <p className="text-sm opacity-70 mb-4">Auxiliary memory usage.</p>
+                <div className="flex-1 min-h-0">
+                    <Bar data={spaceComplexityData} options={{...commonOptions, plugins: {...commonOptions.plugins, title: {display:false}}}} />
+                </div>
+            </motion.div>
+        </div>
+
+        {/* Row 2: Characteristics & Trade-offs (Radar & Bubble) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[500px]">
+                <h3 className="text-xl font-bold mb-2">Algorithm Profile</h3>
+                <p className="text-sm opacity-70 mb-4">Multi-dimensional attribute comparison.</p>
+                <div className="flex-1 min-h-0">
+                    <Radar data={radarData} options={{...commonOptions, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(128, 128, 128, 0.2)' } } }, plugins: { ...commonOptions.plugins, title: { display: false } }}} />
+                </div>
+            </motion.div>
+
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[500px]">
+                <h3 className="text-xl font-bold mb-2">Trade-off Analysis</h3>
+                <p className="text-sm opacity-70 mb-4">X: Time, Y: Space, Size: Complexity.</p>
+                <div className="flex-1 min-h-0">
+                    <Bubble 
+                        data={bubbleData} 
+                        options={{
+                            ...commonOptions,
+                            plugins: { ...commonOptions.plugins, title: { display: false } },
+                            scales: {
+                                y: { ...commonOptions.scales.y, title: { display: true, text: 'Memory Usage' } },
+                                x: { ...commonOptions.scales.x, title: { display: true, text: 'Execution Time' } }
+                            }
+                        }} 
+                    />
+                </div>
+            </motion.div>
+        </div>
+
+        {/* Row 3: Distributions (Doughnut, Pie, Polar) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[400px]">
+                <h3 className="text-lg font-bold mb-2 text-center">{category === 'sorting' ? 'Stability' : 'Optimality'}</h3>
+                <div className="flex-1 min-h-0">
+                    <Doughnut data={stabilityData} options={noGridOptions} />
+                </div>
+            </motion.div>
+
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[400px]">
+                <h3 className="text-lg font-bold mb-2 text-center">Algorithm Type</h3>
+                <div className="flex-1 min-h-0">
+                    <Pie data={typeData} options={noGridOptions} />
+                </div>
+            </motion.div>
+
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 h-[400px]">
+                <h3 className="text-lg font-bold mb-2 text-center">Adaptability</h3>
+                <div className="flex-1 min-h-0">
+                    <PolarArea 
+                        data={polarData} 
+                        options={{
+                            ...noGridOptions,
+                            scales: { r: { ticks: { display: false }, grid: { color: 'rgba(128, 128, 128, 0.2)' } } }
+                        }} 
+                    />
+                </div>
+            </motion.div>
+        </div>
+
+        {/* Row 4: Detailed Operations (Scatter) & Literature */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 lg:col-span-2 h-[400px]">
+                <h3 className="text-xl font-bold mb-2">{category === 'sorting' ? 'Comparisons vs Swaps' : 'Visited Nodes vs Path Length'}</h3>
+                <div className="flex-1 min-h-0">
+                    <Scatter 
+                        data={scatterData} 
+                        options={{
+                            ...commonOptions,
+                            scales: {
+                                y: { ...commonOptions.scales.y, title: { display: true, text: category === 'sorting' ? 'Swaps' : 'Path Length' } },
+                                x: { ...commonOptions.scales.x, title: { display: true, text: category === 'sorting' ? 'Comparisons' : 'Visited Nodes' } }
+                            }
+                        }} 
+                    />
+                </div>
+            </motion.div>
+
+            <motion.div layout className="card bg-base-200 shadow-xl p-6 flex flex-col justify-center">
+                <h2 className="text-2xl font-bold mb-4">Selected Algorithms</h2>
+                <div className="space-y-2 overflow-y-auto pr-2 max-h-[300px]">
+                    {selectedAlgos.map(key => (
+                        <div key={key} className="flex items-center gap-2 p-2 rounded bg-base-300">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: metricsData[key].color }}></div>
+                            <span className="font-semibold">{metricsData[key].name}</span>
+                        </div>
+                    ))}
+                    {selectedAlgos.length === 0 && <p className="opacity-50 italic">Select algorithms to compare</p>}
+                </div>
+            </motion.div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="card bg-base-200 shadow-xl p-6 h-[500px]"
-        >
-            <Radar 
-                data={radarData} 
-                options={{
-                    ...commonOptions, 
-                    scales: { r: { ticks: { display: false }, grid: { color: 'rgba(128, 128, 128, 0.2)' } } },
-                    plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Algorithm Characteristics Comparison' } }
-                }} 
-            />
-        </motion.div>
-
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="card bg-base-200 shadow-xl p-6 flex flex-col justify-center"
-        >
-            <h2 className="text-2xl font-bold mb-4">Key Insights</h2>
-            <ul className="list-disc list-inside space-y-4 text-lg opacity-80">
-                <li><span className="font-bold text-error">O(n²)</span> algorithms like Bubble Sort grow quadratically, making them inefficient for large datasets.</li>
-                <li><span className="font-bold text-info">O(n log n)</span> algorithms like Merge Sort and Quick Sort are significantly faster for large inputs.</li>
-                <li><span className="font-bold text-success">Space Complexity</span> matters: Merge Sort requires O(n) extra space, while Quick Sort and Heap Sort are in-place (O(log n) or O(1)).</li>
-                <li><span className="font-bold text-warning">Stability</span> is crucial when sorting objects with multiple keys; Merge Sort is stable, Quick Sort is not.</li>
-            </ul>
-        </motion.div>
-      </div>
       <div className="h-20"></div>
     </div>
   );
