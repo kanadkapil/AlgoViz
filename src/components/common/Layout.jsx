@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import Footer from './Footer';
 import TheoryPanel from '../theory/TheoryPanel';
 import { AnimatePresence } from 'framer-motion';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, mode, setMode, isTheoryOpen, toggleTheory }) => {
+    // Initialize sidebar state based on screen width
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 1024) {
                 setIsSidebarOpen(true);
@@ -15,18 +17,16 @@ const Layout = ({ children }) => {
                 setIsSidebarOpen(false);
             }
         };
-        
-        // We only want to set default, not force it on every resize if user toggled it.
-        // Actually, standard behavior is usually:
-        // - Desktop: Open by default
-        // - Mobile: Closed by default
-        // Let's just stick to initial state.
-        
-        // Better: Don't auto-close on resize if user opened it, but initial load matters.
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    const closeSidebar = () => setIsSidebarOpen(false);
+
     return (
-        <div className={`drawer ${isSidebarOpen ? 'lg:drawer-open' : ''} h-screen w-screen overflow-hidden`}>
+        <div className={`drawer ${isSidebarOpen ? 'lg:drawer-open' : ''} h-screen w-screen overflow-hidden font-sans bg-base-100 text-base-content`}>
             <input 
                 id="my-drawer-2" 
                 type="checkbox" 
@@ -35,20 +35,37 @@ const Layout = ({ children }) => {
                 onChange={(e) => setIsSidebarOpen(e.target.checked)} 
             />
 
-            <div className="drawer-content flex flex-col h-full overflow-hidden relative">
+            <div className="drawer-content flex flex-col h-full overflow-hidden relative transition-all duration-300">
                 {/* Navbar */}
-                <Navbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+                <Navbar 
+                    toggleSidebar={toggleSidebar} 
+                    mode={mode} 
+                    setMode={setMode}
+                    isTheoryOpen={isTheoryOpen}
+                    toggleTheory={toggleTheory}
+                />
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-hidden relative bg-base-100 p-4">
-                    {children}
-                    <AnimatePresence>
-                        <TheoryPanel />
-                    </AnimatePresence>
+                <main className="flex-1 overflow-y-auto relative scroll-smooth flex flex-col">
+                    <div className="flex-1 p-4">
+                        {children}
+                    </div>
+                    <Footer />
                 </main>
+
+                {/* Theory Panel Overlay */}
+                <AnimatePresence>
+                    {isTheoryOpen && <TheoryPanel isOpen={isTheoryOpen} onClose={toggleTheory} />}
+                </AnimatePresence>
             </div>
 
-            <Sidebar isOpen={isSidebarOpen} closeSidebar={() => setIsSidebarOpen(false)} />
+            {/* Sidebar */}
+            <Sidebar 
+                isOpen={isSidebarOpen} 
+                closeSidebar={closeSidebar} 
+                mode={mode} 
+                setMode={setMode}
+            />
         </div>
     );
 };

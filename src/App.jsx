@@ -13,7 +13,7 @@ import TheoryLanding from './components/theory/TheoryLanding';
 import MetricsLanding from './components/metrics/MetricsLanding';
 
 function App() {
-  const { mode } = useAppStore();
+  const { mode, setMode, isTheoryOpen, toggleTheory } = useAppStore();
 
   // Initialize controllers
   useSortingController();
@@ -21,7 +21,12 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Layout>
+      <Layout 
+        mode={mode} 
+        setMode={setMode}
+        isTheoryOpen={isTheoryOpen}
+        toggleTheory={toggleTheory}
+      >
         <div className="h-full w-full flex items-center justify-center">
           {mode === 'home' ? (
             <Home />

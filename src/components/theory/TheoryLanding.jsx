@@ -12,7 +12,31 @@ const TheoryLanding = () => {
     const algoData = currentData[selectedAlgo];
 
     return (
-        <div className="h-full w-full flex bg-base-100 overflow-hidden">
+        <div className="h-full w-full flex flex-col md:flex-row bg-base-100 overflow-hidden">
+            {/* Mobile Selection Dropdown */}
+            <div className="md:hidden p-4 bg-base-200 border-b border-base-300">
+                <select 
+                    className="select select-bordered w-full"
+                    value={`${selectedCategory}-${selectedAlgo}`}
+                    onChange={(e) => {
+                        const [cat, algo] = e.target.value.split('-');
+                        setSelectedCategory(cat);
+                        setSelectedAlgo(algo);
+                    }}
+                >
+                    <optgroup label="Sorting">
+                        {Object.keys(sortingTheory).map(key => (
+                            <option key={key} value={`sorting-${key}`}>{sortingTheory[key].title}</option>
+                        ))}
+                    </optgroup>
+                    <optgroup label="Pathfinding">
+                        {Object.keys(pathfindingTheory).map(key => (
+                            <option key={key} value={`pathfinding-${key}`}>{pathfindingTheory[key].title}</option>
+                        ))}
+                    </optgroup>
+                </select>
+            </div>
+
             {/* Sidebar */}
             <div className="w-64 bg-base-200 border-r border-base-300 flex-none overflow-y-auto hidden md:block">
                 <div className="p-4">

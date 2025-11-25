@@ -3,12 +3,13 @@ import useAppStore from '../../store/useAppStore';
 import SortingControls from '../sorting/SortingControls';
 import PathfindingControls from '../pathfinding/PathfindingControls';
 
-const Sidebar = ({ isOpen, closeSidebar }) => {
-    const { mode, setMode } = useAppStore();
+const Sidebar = ({ isOpen, closeSidebar, mode, setMode }) => {
+    // Fallback to store if props aren't passed (though Layout passes them)
+    // const { mode, setMode } = useAppStore(); 
 
     return (
         <div className="drawer-side z-50">
-            <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay" onClick={closeSidebar}></label>
+            <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
             <div className="menu p-4 w-80 min-h-full bg-base-200 text-base-content flex flex-col gap-4">
                 {/* Header with Close Button */}
                 <div className="flex justify-between items-center lg:hidden">
