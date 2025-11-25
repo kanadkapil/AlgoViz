@@ -29,9 +29,15 @@ ChartJS.register(
 );
 
 const Home = () => {
-  const { setMode } = useAppStore();
+  const { setMode, openTheory } = useAppStore();
+  const analyticsRef = React.useRef(null);
+
+  const scrollToAnalytics = () => {
+    analyticsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const barData = {
+    // ... (keep existing data)
     labels: ['Bubble', 'Insertion', 'Selection', 'Merge', 'Quick', 'Heap'],
     datasets: [
       {
@@ -74,29 +80,6 @@ const Home = () => {
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
         tension: 0.3,
-      },
-    ],
-  };
-
-  const doughnutData = {
-    labels: ['Sorting', 'Pathfinding', 'Graph', 'Search'],
-    datasets: [
-      {
-        label: '# of Algorithms',
-        data: [10, 10, 5, 5],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-        ],
-        borderWidth: 1,
       },
     ],
   };
@@ -176,9 +159,24 @@ const Home = () => {
       {/* Features Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         {[
-            { title: 'Interactive Visualization', icon: <Zap className="w-8 h-8 text-yellow-500" />, desc: 'Watch algorithms execute step-by-step with real-time visual feedback.' },
-            { title: 'Comprehensive Theory', icon: <Code className="w-8 h-8 text-blue-500" />, desc: 'Deep dive into complexities, pseudocode, and implementation details.' },
-            { title: 'Performance Metrics', icon: <BarChart2 className="w-8 h-8 text-green-500" />, desc: 'Compare efficiency with detailed statistical analysis and graphs.' }
+            { 
+                title: 'Interactive Visualization', 
+                icon: <Zap className="w-8 h-8 text-yellow-500" />, 
+                desc: 'Watch algorithms execute step-by-step with real-time visual feedback.',
+                action: () => setMode('visualization')
+            },
+            { 
+                title: 'Comprehensive Theory', 
+                icon: <Code className="w-8 h-8 text-blue-500" />, 
+                desc: 'Deep dive into complexities, pseudocode, and implementation details.',
+                action: () => setMode('theory')
+            },
+            { 
+                title: 'Performance Metrics', 
+                icon: <BarChart2 className="w-8 h-8 text-green-500" />, 
+                desc: 'Compare efficiency with detailed statistical analysis and graphs.',
+                action: () => setMode('metrics')
+            }
         ].map((feature, idx) => (
             <motion.div 
                 key={idx}
@@ -186,7 +184,8 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.2 }}
                 viewport={{ once: true }}
-                className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+                onClick={feature.action}
             >
                 <div className="card-body items-center text-center">
                     <div className="p-4 rounded-full bg-base-300 mb-2">
@@ -194,13 +193,16 @@ const Home = () => {
                     </div>
                     <h2 className="card-title text-2xl">{feature.title}</h2>
                     <p className="text-base-content/70">{feature.desc}</p>
+                    <div className="card-actions mt-4">
+                        <button className="btn btn-sm btn-outline btn-primary">Try Now</button>
+                    </div>
                 </div>
             </motion.div>
         ))}
       </div>
 
       {/* Analytics Section */}
-      <div className="flex flex-col gap-12">
+      <div ref={analyticsRef} className="flex flex-col gap-12">
         <div className="text-center mb-8">
             <h2 className="text-4xl font-bold mb-4">Analytical Insights</h2>
             <p className="text-xl text-base-content/60">Understand the mathematical foundations through visual data.</p>

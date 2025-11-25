@@ -29,16 +29,24 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
                             Home
                         </button>
                         <button 
-                            className={`btn join-item flex-1 ${mode === 'sorting' ? 'btn-primary' : 'btn-neutral'}`}
-                            onClick={() => { setMode('sorting'); closeSidebar(); }}
+                            className={`btn join-item flex-1 ${mode === 'visualization' || mode === 'sorting' || mode === 'pathfinding' ? 'btn-primary' : 'btn-neutral'}`}
+                            onClick={() => { setMode('visualization'); closeSidebar(); }}
                         >
-                            Sorting
+                            Visualize
+                        </button>
+                    </div>
+                    <div className="join w-full mt-2">
+                        <button 
+                            className={`btn join-item flex-1 ${mode === 'theory' ? 'btn-primary' : 'btn-neutral'}`}
+                            onClick={() => { setMode('theory'); closeSidebar(); }}
+                        >
+                            Theory
                         </button>
                         <button 
-                            className={`btn join-item flex-1 ${mode === 'pathfinding' ? 'btn-primary' : 'btn-neutral'}`}
-                            onClick={() => { setMode('pathfinding'); closeSidebar(); }}
+                            className={`btn join-item flex-1 ${mode === 'metrics' ? 'btn-primary' : 'btn-neutral'}`}
+                            onClick={() => { setMode('metrics'); closeSidebar(); }}
                         >
-                            Pathfinding
+                            Metrics
                         </button>
                     </div>
                     <div className="divider my-2"></div>

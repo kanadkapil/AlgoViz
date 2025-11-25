@@ -23,16 +23,22 @@ const Navbar = ({ toggleSidebar }) => {
                         Home
                     </button>
                     <button
-                        className={`btn btn-sm ${mode === 'sorting' ? 'btn-primary' : 'btn-ghost'}`}
-                        onClick={() => setMode('sorting')}
+                        className={`btn btn-sm ${mode === 'visualization' || mode === 'sorting' || mode === 'pathfinding' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={() => setMode('visualization')}
                     >
-                        Sorting
+                        Visualize
                     </button>
                     <button
-                        className={`btn btn-sm ${mode === 'pathfinding' ? 'btn-primary' : 'btn-ghost'}`}
-                        onClick={() => setMode('pathfinding')}
+                        className={`btn btn-sm ${mode === 'theory' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={() => setMode('theory')}
                     >
-                        Pathfinding
+                        Theory
+                    </button>
+                    <button
+                        className={`btn btn-sm ${mode === 'metrics' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={() => setMode('metrics')}
+                    >
+                        Metrics
                     </button>
                 </div>
             </div>

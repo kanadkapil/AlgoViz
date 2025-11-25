@@ -8,6 +8,9 @@ import usePathfindingController from './hooks/usePathfindingController';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 import Home from './components/home/Home';
+import VisualizationLanding from './components/visualization/VisualizationLanding';
+import TheoryLanding from './components/theory/TheoryLanding';
+import MetricsLanding from './components/metrics/MetricsLanding';
 
 function App() {
   const { mode } = useAppStore();
@@ -22,6 +25,12 @@ function App() {
         <div className="h-full w-full flex items-center justify-center">
           {mode === 'home' ? (
             <Home />
+          ) : mode === 'visualization' ? (
+            <VisualizationLanding />
+          ) : mode === 'theory' ? (
+            <TheoryLanding />
+          ) : mode === 'metrics' ? (
+            <MetricsLanding />
           ) : mode === 'sorting' ? (
             <SortingVisualizer />
           ) : (
