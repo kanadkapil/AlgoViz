@@ -90,6 +90,10 @@ const PathfindingControls = () => {
                     <RotateCcw className="w-4 h-4" />
                 </button>
             </div>
+            
+            <div className="text-xs text-center opacity-70 mt-2">
+                Tip: Drag <span className="text-success font-bold">Start</span> & <span className="text-error font-bold">End</span> nodes to move them!
+            </div>
         </div>
     );
 };
