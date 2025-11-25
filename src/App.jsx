@@ -7,6 +7,8 @@ import useSortingController from './hooks/useSortingController';
 import usePathfindingController from './hooks/usePathfindingController';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
+import Home from './components/home/Home';
+
 function App() {
   const { mode } = useAppStore();
 
@@ -18,7 +20,9 @@ function App() {
     <ErrorBoundary>
       <Layout>
         <div className="h-full w-full flex items-center justify-center">
-          {mode === 'sorting' ? (
+          {mode === 'home' ? (
+            <Home />
+          ) : mode === 'sorting' ? (
             <SortingVisualizer />
           ) : (
             <PathfindingGrid />

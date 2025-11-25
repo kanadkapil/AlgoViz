@@ -3,10 +3,7 @@ import useAppStore from '../../store/useAppStore';
 import { Palette } from 'lucide-react';
 
 const themes = [
-    "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
-    "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
-    "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula",
-    "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"
+    "light", "dark", "cupcake", "retro", "cyberpunk", "dracula", "coffee", "business", "lemonade"
 ];
 
 const ThemeSwitcher = () => {

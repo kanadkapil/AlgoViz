@@ -23,6 +23,12 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
                     <h3 className="font-semibold opacity-70">Mode</h3>
                     <div className="join w-full">
                         <button 
+                            className={`btn join-item flex-1 ${mode === 'home' ? 'btn-primary' : 'btn-neutral'}`}
+                            onClick={() => { setMode('home'); closeSidebar(); }}
+                        >
+                            Home
+                        </button>
+                        <button 
                             className={`btn join-item flex-1 ${mode === 'sorting' ? 'btn-primary' : 'btn-neutral'}`}
                             onClick={() => { setMode('sorting'); closeSidebar(); }}
                         >

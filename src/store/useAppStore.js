@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 
 const useAppStore = create((set) => ({
-    theme: 'dark',
-    mode: 'sorting', // 'sorting' or 'pathfinding'
+    theme: localStorage.getItem('theme') || 'dark',
+    mode: 'home', // Default to home
     isComparisonMode: false,
     isTheoryOpen: false,
 
-    setTheme: (theme) => set({ theme }),
+    setTheme: (theme) => {
+        localStorage.setItem('theme', theme);
+        set({ theme });
+    },
     setMode: (mode) => set({ mode }),
     toggleComparisonMode: () => set((state) => ({ isComparisonMode: !state.isComparisonMode })),
     toggleTheory: () => set((state) => ({ isTheoryOpen: !state.isTheoryOpen })),

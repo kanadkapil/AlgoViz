@@ -17,6 +17,12 @@ const Navbar = ({ toggleSidebar }) => {
                 <span className="text-xl font-bold text-primary mr-8">AlgoViz</span>
                 <div className="hidden lg:flex gap-2">
                     <button
+                        className={`btn btn-sm ${mode === 'home' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={() => setMode('home')}
+                    >
+                        Home
+                    </button>
+                    <button
                         className={`btn btn-sm ${mode === 'sorting' ? 'btn-primary' : 'btn-ghost'}`}
                         onClick={() => setMode('sorting')}
                     >
