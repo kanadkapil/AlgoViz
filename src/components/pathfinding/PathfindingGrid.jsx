@@ -13,7 +13,7 @@ const Node = ({ row, col, isStart, isEnd, isWall, isVisited, isPath, onMouseDown
     return (
         <div
             id={`node-${row}-${col}`}
-            className={`w-6 h-6 ${extraClass}`}
+            className={`w-4 h-4 md:w-6 md:h-6 ${extraClass}`}
             style={{ backgroundColor: isWall ? '#1e293b' : undefined }} // Force slate-800 for walls
             onMouseDown={() => onMouseDown(row, col)}
             onMouseEnter={() => onMouseEnter(row, col)}

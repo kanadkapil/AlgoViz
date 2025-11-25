@@ -26,7 +26,7 @@ const TheoryPanel = () => {
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
-        className="fixed right-0 top-16 bottom-0 w-96 bg-base-100 border-l border-base-300 shadow-xl z-20 p-4"
+        className="fixed right-0 top-16 bottom-0 w-full md:w-96 bg-base-100 border-l border-base-300 shadow-xl z-20 p-4"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Theory</h2>
@@ -45,7 +45,7 @@ const TheoryPanel = () => {
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed right-0 top-16 bottom-0 w-[500px] bg-base-100 border-l border-base-300 shadow-xl z-20 flex flex-col"
+      className="fixed right-0 top-16 bottom-0 w-full md:w-[500px] bg-base-100 border-l border-base-300 shadow-xl z-30 flex flex-col"
     >
       {/* Header */}
       <div className="p-4 border-b border-base-300 flex justify-between items-center bg-base-200/50">

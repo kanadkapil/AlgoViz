@@ -9,7 +9,7 @@ const Navbar = ({ toggleSidebar }) => {
     return (
         <div className="navbar bg-base-100 border-b border-base-300 h-16 min-h-[4rem]">
             <div className="flex-none">
-                <button className="btn btn-square btn-ghost lg:hidden" onClick={toggleSidebar}>
+                <button className="btn btn-square btn-ghost z-50" onClick={toggleSidebar}>
                     <Menu className="w-5 h-5" />
                 </button>
             </div>

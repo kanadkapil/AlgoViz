@@ -4,13 +4,41 @@ import SortingControls from '../sorting/SortingControls';
 import PathfindingControls from '../pathfinding/PathfindingControls';
 
 const Sidebar = ({ isOpen, closeSidebar }) => {
-    const { mode } = useAppStore();
+    const { mode, setMode } = useAppStore();
 
     return (
-        <div className={`drawer-side z-20 ${isOpen ? 'drawer-open' : ''}`}>
+        <div className="drawer-side z-50">
             <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay" onClick={closeSidebar}></label>
             <div className="menu p-4 w-80 min-h-full bg-base-200 text-base-content flex flex-col gap-4">
-                <h2 className="text-lg font-bold mb-2">Controls</h2>
+                {/* Header with Close Button */}
+                <div className="flex justify-between items-center lg:hidden">
+                    <h2 className="text-lg font-bold">Menu</h2>
+                    <button className="btn btn-square btn-ghost btn-sm" onClick={closeSidebar}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                {/* Mobile Mode Switcher */}
+                <div className="flex flex-col gap-2 lg:hidden">
+                    <h3 className="font-semibold opacity-70">Mode</h3>
+                    <div className="join w-full">
+                        <button 
+                            className={`btn join-item flex-1 ${mode === 'sorting' ? 'btn-primary' : 'btn-neutral'}`}
+                            onClick={() => { setMode('sorting'); closeSidebar(); }}
+                        >
+                            Sorting
+                        </button>
+                        <button 
+                            className={`btn join-item flex-1 ${mode === 'pathfinding' ? 'btn-primary' : 'btn-neutral'}`}
+                            onClick={() => { setMode('pathfinding'); closeSidebar(); }}
+                        >
+                            Pathfinding
+                        </button>
+                    </div>
+                    <div className="divider my-2"></div>
+                </div>
+
+                <h2 className="text-lg font-bold mb-2 hidden lg:block">Controls</h2>
 
                 {/* Specific controls based on mode */}
                 <div className="flex-1">
