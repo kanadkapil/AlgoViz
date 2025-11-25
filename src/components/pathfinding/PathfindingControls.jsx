@@ -10,7 +10,10 @@ const PathfindingControls = () => {
         setIsPlaying,
         resetGrid,
         clearPath,
-        isFinished
+        isFinished,
+        randomizeGrid,
+        gridSize,
+        setGridSize
     } = usePathfindingStore();
 
     return (
@@ -30,8 +33,28 @@ const PathfindingControls = () => {
                     <option value="astar">A* Search</option>
                     <option value="bfs">Breadth-First Search (BFS)</option>
                     <option value="dfs">Depth-First Search (DFS)</option>
-                    {/* Add more options */}
+                    <option value="greedyBestFirstSearch">Greedy Best-First Search</option>
+                    <option value="bellmanFord">Bellman-Ford</option>
+                    <option value="iddfs">IDDFS</option>
+                    <option value="uniformCostSearch">Uniform Cost Search</option>
+                    <option value="bidirectionalBFS">Bidirectional BFS</option>
                 </select>
+            </div>
+
+            {/* Grid Size */}
+            <div className="form-control w-full">
+                <label className="label">
+                    <span className="label-text">Grid Size: {gridSize}x{gridSize}</span>
+                </label>
+                <input 
+                    type="range" 
+                    min="10" 
+                    max="50" 
+                    value={gridSize} 
+                    className="range range-xs range-primary" 
+                    onChange={(e) => setGridSize(parseInt(e.target.value))}
+                    disabled={isPlaying}
+                />
             </div>
 
             {/* Action Buttons */}
@@ -43,6 +66,14 @@ const PathfindingControls = () => {
                 >
                     {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     {isPlaying ? 'Pause' : 'Play'}
+                </button>
+                <button
+                    className="btn btn-secondary btn-square"
+                    onClick={randomizeGrid}
+                    title="Random Maze"
+                    disabled={isPlaying}
+                >
+                    <span className="text-xs font-bold">RND</span>
                 </button>
                 <button
                     className="btn btn-neutral btn-square"

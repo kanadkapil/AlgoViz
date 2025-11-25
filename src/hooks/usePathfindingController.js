@@ -4,13 +4,22 @@ import { dijkstra, getNodesInShortestPathOrder } from '../algorithms/pathfinding
 import { astar } from '../algorithms/pathfinding/astar';
 import { bfs } from '../algorithms/pathfinding/bfs';
 import { dfs } from '../algorithms/pathfinding/dfs';
+import { greedyBestFirstSearch } from '../algorithms/pathfinding/greedyBestFirstSearch';
+import { bellmanFord } from '../algorithms/pathfinding/bellmanFord';
+import { iddfs } from '../algorithms/pathfinding/iddfs';
+import { uniformCostSearch } from '../algorithms/pathfinding/uniformCostSearch';
+import { bidirectionalBFS } from '../algorithms/pathfinding/bidirectionalBFS';
 
 const algorithms = {
     dijkstra,
     astar,
     bfs,
     dfs,
-    // Add others here
+    greedyBestFirstSearch,
+    bellmanFord,
+    iddfs,
+    uniformCostSearch,
+    bidirectionalBFS,
 };
 
 const usePathfindingController = () => {
