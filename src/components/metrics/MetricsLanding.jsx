@@ -39,6 +39,9 @@ const MetricsLanding = () => {
   const metricsData = category === 'sorting' ? sortingMetrics : pathfindingMetrics;
   const availableAlgos = Object.keys(metricsData);
 
+  // Filter selectedAlgos to ensure they exist in the current metricsData (prevents crash during category switch)
+  const safeSelectedAlgos = selectedAlgos.filter(key => metricsData[key]);
+
   // Ensure selection is valid when switching categories
   React.useEffect(() => {
     if (category === 'pathfinding' && !selectedAlgos.some(algo => pathfindingMetrics[algo])) {
@@ -85,7 +88,7 @@ const MetricsLanding = () => {
 
   const timeComplexityData = useMemo(() => ({
     labels: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
-    datasets: selectedAlgos.map(key => ({
+    datasets: safeSelectedAlgos.map(key => ({
         label: metricsData[key].name,
         data: metricsData[key].timeComplexity,
         borderColor: metricsData[key].color,
@@ -93,33 +96,33 @@ const MetricsLanding = () => {
         fill: false,
         tension: 0.4,
     }))
-  }), [selectedAlgos, metricsData]);
+  }), [safeSelectedAlgos, metricsData]);
 
   const spaceComplexityData = useMemo(() => ({
-    labels: selectedAlgos.map(key => metricsData[key].name),
+    labels: safeSelectedAlgos.map(key => metricsData[key].name),
     datasets: [{
         label: 'Auxiliary Space (Units)',
-        data: selectedAlgos.map(key => metricsData[key].spaceComplexity),
-        backgroundColor: selectedAlgos.map(key => metricsData[key].color),
+        data: safeSelectedAlgos.map(key => metricsData[key].spaceComplexity),
+        backgroundColor: safeSelectedAlgos.map(key => metricsData[key].color),
     }]
-  }), [selectedAlgos, metricsData]);
+  }), [safeSelectedAlgos, metricsData]);
 
   const radarData = useMemo(() => ({
     labels: category === 'sorting' 
         ? ['Speed (Small)', 'Speed (Large)', 'Memory', 'Simplicity', 'Stability']
         : ['Speed', 'Memory', 'Simplicity', 'Optimality', 'Completeness'],
-    datasets: selectedAlgos.map(key => ({
+    datasets: safeSelectedAlgos.map(key => ({
         label: metricsData[key].name,
         data: metricsData[key].radar,
         backgroundColor: metricsData[key].bg,
         borderColor: metricsData[key].color,
         borderWidth: 2,
     }))
-  }), [selectedAlgos, metricsData, category]);
+  }), [safeSelectedAlgos, metricsData, category]);
 
   const stabilityData = useMemo(() => {
-    const stableCount = selectedAlgos.filter(key => metricsData[key].isStable).length;
-    const unstableCount = selectedAlgos.length - stableCount;
+    const stableCount = safeSelectedAlgos.filter(key => metricsData[key].isStable).length;
+    const unstableCount = safeSelectedAlgos.length - stableCount;
     return {
         labels: [category === 'sorting' ? 'Stable' : 'Optimal', category === 'sorting' ? 'Unstable' : 'Sub-optimal'],
         datasets: [{
@@ -129,11 +132,11 @@ const MetricsLanding = () => {
             borderWidth: 1,
         }]
     };
-  }, [selectedAlgos, metricsData, category]);
+  }, [safeSelectedAlgos, metricsData, category]);
 
   const typeData = useMemo(() => {
     const types = {};
-    selectedAlgos.forEach(key => {
+    safeSelectedAlgos.forEach(key => {
         const t = metricsData[key].type;
         types[t] = (types[t] || 0) + 1;
     });
@@ -146,36 +149,36 @@ const MetricsLanding = () => {
             borderWidth: 1,
         }]
     };
-  }, [selectedAlgos, metricsData]);
+  }, [safeSelectedAlgos, metricsData]);
 
   const polarData = useMemo(() => ({
     labels: category === 'sorting' 
         ? ['Random', 'Sorted', 'Reverse', 'Few Unique']
         : ['Open Maze', 'Maze with Walls', 'Weighted', 'Negative Edges'],
-    datasets: selectedAlgos.map(key => ({
+    datasets: safeSelectedAlgos.map(key => ({
         label: metricsData[key].name,
         data: metricsData[key].polar,
         backgroundColor: metricsData[key].bg.replace('0.2', '0.5'), // More opaque
         borderWidth: 1,
     }))
-  }), [selectedAlgos, metricsData, category]);
+  }), [safeSelectedAlgos, metricsData, category]);
 
   const bubbleData = useMemo(() => ({
-    datasets: selectedAlgos.map(key => ({
+    datasets: safeSelectedAlgos.map(key => ({
         label: metricsData[key].name,
         data: [metricsData[key].bubble],
         backgroundColor: metricsData[key].color,
     }))
-  }), [selectedAlgos, metricsData]);
+  }), [safeSelectedAlgos, metricsData]);
 
   const scatterData = useMemo(() => ({
-    datasets: selectedAlgos.map(key => ({
+    datasets: safeSelectedAlgos.map(key => ({
         label: metricsData[key].name,
         data: [metricsData[key].scatter],
         backgroundColor: metricsData[key].color,
         pointRadius: 8
     }))
-  }), [selectedAlgos, metricsData]);
+  }), [safeSelectedAlgos, metricsData]);
 
 
   return (
@@ -303,6 +306,11 @@ const MetricsLanding = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <motion.div layout className="card bg-base-200 shadow-xl p-6 lg:col-span-2 h-[400px]">
                 <h3 className="text-xl font-bold mb-2">{category === 'sorting' ? 'Comparisons vs Swaps' : 'Visited Nodes vs Path Length'}</h3>
+                <p className="text-sm opacity-70 mb-4">
+                    {category === 'sorting' 
+                        ? 'Swaps are often more expensive than comparisons in memory operations.' 
+                        : 'Efficiency is measured by how few nodes are visited to find the shortest path.'}
+                </p>
                 <div className="flex-1 min-h-0">
                     <Scatter 
                         data={scatterData} 
@@ -318,15 +326,32 @@ const MetricsLanding = () => {
             </motion.div>
 
             <motion.div layout className="card bg-base-200 shadow-xl p-6 flex flex-col justify-center">
-                <h2 className="text-2xl font-bold mb-4">Selected Algorithms</h2>
-                <div className="space-y-2 overflow-y-auto pr-2 max-h-[300px]">
-                    {selectedAlgos.map(key => (
-                        <div key={key} className="flex items-center gap-2 p-2 rounded bg-base-300">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: metricsData[key].color }}></div>
-                            <span className="font-semibold">{metricsData[key].name}</span>
-                        </div>
-                    ))}
-                    {selectedAlgos.length === 0 && <p className="opacity-50 italic">Select algorithms to compare</p>}
+                <h2 className="text-2xl font-bold mb-4">Metric Definitions</h2>
+                <div className="space-y-4 overflow-y-auto pr-2">
+                    <div>
+                        <h4 className="font-bold text-primary">Time Complexity</h4>
+                        <p className="text-sm opacity-70">
+                            {category === 'sorting'
+                                ? 'How the execution time grows as the list size increases.'
+                                : 'How execution time grows with the number of vertices (V) and edges (E).'}
+                        </p>
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-secondary">Space Complexity</h4>
+                        <p className="text-sm opacity-70">
+                            {category === 'sorting'
+                                ? 'Extra memory needed. O(1) is ideal (in-place).'
+                                : 'Memory needed to store the frontier and visited set.'}
+                        </p>
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-accent">{category === 'sorting' ? 'Stability' : 'Optimality'}</h4>
+                        <p className="text-sm opacity-70">
+                            {category === 'sorting'
+                                ? 'Preserves the relative order of equal elements. Crucial for multi-key sorting.'
+                                : 'Guarantees finding the shortest possible path (e.g., Dijkstra, A*).'}
+                        </p>
+                    </div>
                 </div>
             </motion.div>
         </div>
